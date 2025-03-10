@@ -7,12 +7,13 @@
 
 import SwiftUI
 
-public struct BottomSheet<HContent: View, MContent: View, V: View>: View {
+public struct BottomSheet<SContent: View, HContent: View, MContent: View, V: View>: View {
     
     @Binding private var bottomSheetPosition: BottomSheetPosition
     
     // Views
     private let view: V
+    private let snapContent: SContent?
     private let headerContent: HContent?
     private let mainContent: MContent
     
@@ -27,13 +28,16 @@ public struct BottomSheet<HContent: View, MContent: View, V: View>: View {
             // The original view
             self.view
             
-            BottomSheetView(
-                bottomSheetPosition: self.$bottomSheetPosition,
-                headerContent: self.headerContent,
-                mainContent: self.mainContent,
-                switchablePositions: self.switchablePositions,
-                configuration: self.configuration
-            )
+            VStack{
+                snapContent
+                BottomSheetView(
+                    bottomSheetPosition: self.$bottomSheetPosition,
+                    headerContent: self.headerContent,
+                    mainContent: self.mainContent,
+                    switchablePositions: self.switchablePositions,
+                    configuration: self.configuration
+                )
+            }
         }
     }
     
@@ -41,12 +45,14 @@ public struct BottomSheet<HContent: View, MContent: View, V: View>: View {
     internal init(
         bottomSheetPosition: Binding<BottomSheetPosition>,
         switchablePositions: [BottomSheetPosition],
+        snapContent: SContent?,
         headerContent: HContent?,
         mainContent: MContent,
         view: V
     ) {
         self._bottomSheetPosition = bottomSheetPosition
         self.switchablePositions = switchablePositions
+        self.snapContent = snapContent
         self.headerContent = headerContent
         self.mainContent = mainContent
         self.view = view
@@ -62,6 +68,7 @@ public struct BottomSheet<HContent: View, MContent: View, V: View>: View {
         self.init(
             bottomSheetPosition: bottomSheetPosition,
             switchablePositions: switchablePositions,
+            snapContent: nil,
             headerContent: {
                 if let title = title {
                     return Text(title)
@@ -91,17 +98,39 @@ public extension View {
     /// - Parameter headerContent: A view that is used as header content for the BottomSheet.
     /// You can use a String that is displayed as title instead.
     /// - Parameter mainContent: A view that is used as main content for the BottomSheet.
-    func bottomSheet<HContent: View, MContent: View>(
+    func bottomSheet<SContent: View, HContent: View, MContent: View>(
         bottomSheetPosition: Binding<BottomSheetPosition>,
         switchablePositions: [BottomSheetPosition],
         @ViewBuilder headerContent: () -> HContent? = {
             return nil
         },
         @ViewBuilder mainContent: () -> MContent
-    ) -> BottomSheet<HContent, MContent, Self> {
+    ) -> BottomSheet<SContent, HContent, MContent, Self> {
         BottomSheet(
             bottomSheetPosition: bottomSheetPosition,
             switchablePositions: switchablePositions,
+            snapContent: nil,
+            headerContent: headerContent(),
+            mainContent: mainContent(),
+            view: self
+        )
+    }
+    
+    func bottomSheet<SContent: View, HContent: View, MContent: View>(
+        bottomSheetPosition: Binding<BottomSheetPosition>,
+        switchablePositions: [BottomSheetPosition],
+        @ViewBuilder snapContent: () -> SContent? = {
+            return nil
+        },
+        @ViewBuilder headerContent: () -> HContent? = {
+            return nil
+        },
+        @ViewBuilder mainContent: () -> MContent
+    ) -> BottomSheet<SContent, HContent, MContent, Self> {
+        BottomSheet(
+            bottomSheetPosition: bottomSheetPosition,
+            switchablePositions: switchablePositions,
+            snapContent: snapContent(),
             headerContent: headerContent(),
             mainContent: mainContent(),
             view: self
@@ -120,12 +149,12 @@ public extension View {
     /// - Parameter content: A view that is used as main content for the BottomSheet.
     typealias TitleContent = ModifiedContent<Text, _EnvironmentKeyWritingModifier<Int?>>
     
-    func bottomSheet<MContent: View>(
+    func bottomSheet<SContent: View, MContent: View>(
         bottomSheetPosition: Binding<BottomSheetPosition>,
         switchablePositions: [BottomSheetPosition],
         title: String? = nil,
         @ViewBuilder content: () -> MContent
-    ) -> BottomSheet<TitleContent, MContent, Self> {
+    ) -> BottomSheet<SContent, TitleContent, MContent, Self> {
         BottomSheet(
             bottomSheetPosition: bottomSheetPosition,
             switchablePositions: switchablePositions,
