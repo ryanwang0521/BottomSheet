@@ -60,7 +60,12 @@ internal struct BottomSheetView<SContent: View, HContent: View, MContent: View>:
                     self.fullScreenBackground(with: geometry)
                     
                     // The BottomSheet itself
-                    self.bottomSheet(with: geometry)
+                    VStack{
+                        self.snapContent
+                        self.bottomSheet(with: geometry)
+                    }
+                }else{
+                    self.snapContent
                 }
             }
             // Handle drag ended or cancelled

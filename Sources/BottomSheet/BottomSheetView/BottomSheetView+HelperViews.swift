@@ -42,7 +42,6 @@ internal extension BottomSheetView {
             }
             
             // The header an main content
-            self.snapContent
             self.bottomSheetContent(with: geometry)
             
             // Drag indicator on the bottom (iPad floating and Mac)
