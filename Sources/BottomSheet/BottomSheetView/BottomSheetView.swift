@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-internal struct BottomSheetView<HContent: View, MContent: View>: View {
+internal struct BottomSheetView<SContent: View, HContent: View, MContent: View>: View {
     @GestureState var isDragging: Bool = false
     @State var lastDragValue: DragGesture.Value?
 
@@ -35,6 +35,7 @@ internal struct BottomSheetView<HContent: View, MContent: View>: View {
 #endif
     
     // Views
+    let snapContent: SContent?
     let headerContent: HContent?
     let mainContent: MContent
     

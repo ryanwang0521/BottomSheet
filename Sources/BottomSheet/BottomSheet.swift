@@ -27,17 +27,14 @@ public struct BottomSheet<SContent: View, HContent: View, MContent: View, V: Vie
         ZStack {
             // The original view
             self.view
-            
-            VStack{
-                snapContent
-                BottomSheetView(
-                    bottomSheetPosition: self.$bottomSheetPosition,
-                    headerContent: self.headerContent,
-                    mainContent: self.mainContent,
-                    switchablePositions: self.switchablePositions,
-                    configuration: self.configuration
-                )
-            }
+            BottomSheetView(
+                bottomSheetPosition: self.$bottomSheetPosition,
+                snapContent: self.snapContent,
+                headerContent: self.headerContent,
+                mainContent: self.mainContent,
+                switchablePositions: self.switchablePositions,
+                configuration: self.configuration
+            )
         }
     }
     
